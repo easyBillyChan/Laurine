@@ -1837,8 +1837,12 @@ class TemplateFactory {
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     // MARK: - Public - Swift Templates
 	
+	class func functionToCurrentBundle() -> String {
+		return "Language.currentBundle"
+	}
+	
 	class func generateLocalizeFuncCall(key: String, table: String) -> String {
-		return "NSLocalizedString(\"\(key)\", \(tableName)comment: \"\")"
+		return "NSLocalizedString(\"\(key)\", tableName: \"\(table)\", bundle: \(functionToCurrentBundle()), comment: \"\")"
 	}
     
     class func templateForSwiftStructWithName(name : String, content : String, contentLevel : Int) -> String {
@@ -1859,7 +1863,7 @@ class TemplateFactory {
             tableName = ""
         }
         return TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "/// Base translation: \(baseTranslation)\n"
-             + TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "public static var \(name) : String = " + generateLocalizeFuncCall(key, table) + "\n"
+			+ TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "public static var \(name) : String = " + generateLocalizeFuncCall(key: key, table: tableName) + "\n"
     }
     
     
@@ -1872,7 +1876,7 @@ class TemplateFactory {
         }
         return TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "/// Base translation: \(baseTranslation)\n"
              + TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "public static func \(name)(\(methodHeader)) -> String {\n"
-             + TemplateFactory.contentIndentForLevel(contentLevel: contentLevel + 1) + "return String(format: " + generateLocalizeFuncCall(key, table) + ", \(params))\n"
+             + TemplateFactory.contentIndentForLevel(contentLevel: contentLevel + 1) + "return String(format: " + generateLocalizeFuncCall(key: key, table: tableName) + ", \(params))\n"
              + TemplateFactory.contentIndentForLevel(contentLevel: contentLevel) + "}\n"
     }
     
@@ -1891,7 +1895,7 @@ class TemplateFactory {
     class func templateForObjCStaticVarImplementationWithName(name : String, key : String, table: String?, baseTranslation : String, contentLevel : Int) -> String {
         let tableName = table != nil ? "@\"\(table!)\"" : "nil"
         return "- (NSString *)\(name) {\n"
-            + TemplateFactory.contentIndentForLevel(contentLevel: 1) + "return " + generateLocalizeFuncCall(key, table) + ";\n"
+            + TemplateFactory.contentIndentForLevel(contentLevel: 1) + "return " + generateLocalizeFuncCall(key: key, table: tableName) + ";\n"
             + "}\n"
     }
     
@@ -1908,7 +1912,7 @@ class TemplateFactory {
         let tableName = table != nil ? "@\"\(table!)\"" : "nil"
         return "- (NSString *(^)(\(methodHeader)))\(name) {\n"
              + TemplateFactory.contentIndentForLevel(contentLevel: 1) + "return ^(\(blockHeader)) {\n"
-             + TemplateFactory.contentIndentForLevel(contentLevel: 2) + "return [NSString stringWithFormat: " + generateLocalizeFuncCall(key, table) + ", \(blockParams)];\n"
+             + TemplateFactory.contentIndentForLevel(contentLevel: 2) + "return [NSString stringWithFormat: " + generateLocalizeFuncCall(key: key, table: tableName) + ", \(blockParams)];\n"
              + TemplateFactory.contentIndentForLevel(contentLevel: 1) + "};\n"
              + "}\n"
     }
